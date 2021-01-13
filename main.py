@@ -23,7 +23,12 @@ users = {
         {
             'id': 'yat999',
             'name': 'Dee',
-            'job': 'Aspring actress',
+            'job': 'Actress',
+        },
+        {
+            'id': 'for219',
+            'name': 'Doo',
+            'job': 'Actress',
         },
         {
             'id': 'zap555',
@@ -51,17 +56,28 @@ def get_user(user_id):
         return make_response(jsonify(success=False), 404)
 
 
+def name_filter(name):
+    return lambda x: x['name'] == name
+
+
+def job_filter(job):
+    return lambda x: x['job'] == job
+
+
 @app.route('/users', methods=['GET', 'POST'])
 def get_users():
-    search_username = request.args.get('name')
     if request.method == 'GET':
+        query = users['users_list']
+
+        search_username = request.args.get('name')
         if search_username:
-            subdict = {'users_list': []}
-            for user in users['users_list']:
-                if user['name'] == search_username:
-                    subdict['users_list'].append(user)
-            return subdict
-        return users
+            query = filter(name_filter(search_username), query)
+
+        search_job = request.args.get('job')
+        if search_job:
+            query = filter(job_filter(search_job), query)
+
+        return jsonify(list(query))
     elif request.method == 'POST':
         userToAdd = request.get_json()
         users['users_list'].append(userToAdd)
