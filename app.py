@@ -1,5 +1,12 @@
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
+import random
+import string
+
+
+def random_string():
+    return ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
+
 
 app = Flask(__name__)
 CORS(app)
@@ -81,10 +88,10 @@ def get_users():
 
         return jsonify(list(query))
     elif request.method == 'POST':
-        userToAdd = request.get_json()
+        userToAdd = {**request.get_json(), 'id': random_string()}
         users['users_list'].append(userToAdd)
         resp = jsonify(success=True)
-        return resp
+        return make_response(jsonify(userToAdd), 201)
     raise Exception("Unsupported method")
 
 
