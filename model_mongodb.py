@@ -38,14 +38,10 @@ class User(Model):
     db_client = pymongo.MongoClient('localhost', 27017)
     collection = db_client["users"]["users_list"]
 
-    def find_all(self):
-        users = list(self.collection.find())
-        for user in users:
-            user["_id"] = str(user["_id"])
-        return users
-
-    def find_by_name(self, name):
-        users = list(self.collection.find({"name": name}))
+    @staticmethod
+    def find_all(**query):
+        query['_id'] = ObjectId(query['_id'])
+        users = list(User.collection.find(query))
         for user in users:
             user["_id"] = str(user["_id"])
         return users

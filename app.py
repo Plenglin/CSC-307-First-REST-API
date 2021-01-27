@@ -3,6 +3,8 @@ from flask_cors import CORS
 import random
 import string
 
+from model_mongodb import User
+
 
 def random_string():
     return ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
@@ -11,49 +13,12 @@ def random_string():
 app = Flask(__name__)
 CORS(app)
 
-users = {
-    'users_list':
-    [
-        {
-            'id': 'xyz789',
-            'name': 'Charlie',
-            'job': 'Janitor',
-        },
-        {
-            'id': 'abc123',
-            'name': 'Mac',
-            'job': 'Bouncer',
-        },
-        {
-            'id': 'ppp222',
-            'name': 'Mac',
-            'job': 'Professor',
-        },
-        {
-            'id': 'yat999',
-            'name': 'Dee',
-            'job': 'Actress',
-        },
-        {
-            'id': 'for219',
-            'name': 'Doo',
-            'job': 'Actress',
-        },
-        {
-            'id': 'zap555',
-            'name': 'Dennis',
-            'job': 'Bartender',
-        }
-    ]
-}
-
 
 @app.route('/users/<user_id>', methods=['GET', 'DELETE'])
 def get_user(user_id):
     if request.method == 'GET':
-        for user in users['users_list']:
-            if user_id == user['id']:
-                return user
+        for user in User.find_all(_id=user_id):
+            return user
         return jsonify(success=False, status=404)
     elif request.method == 'DELETE':
         to_delete = None
@@ -65,28 +30,10 @@ def get_user(user_id):
         return make_response(jsonify(success=False), 404)
 
 
-def name_filter(name):
-    return lambda x: x['name'] == name
-
-
-def job_filter(job):
-    return lambda x: x['job'] == job
-
-
 @app.route('/users', methods=['GET', 'POST'])
 def get_users():
     if request.method == 'GET':
-        query = users['users_list']
-
-        search_username = request.args.get('name')
-        if search_username:
-            query = filter(name_filter(search_username), query)
-
-        search_job = request.args.get('job')
-        if search_job:
-            query = filter(job_filter(search_job), query)
-
-        return jsonify(list(query))
+        return jsonify(list(User.find_all(**request.args)))
     elif request.method == 'POST':
         userToAdd = {**request.get_json(), 'id': random_string()}
         users['users_list'].append(userToAdd)
