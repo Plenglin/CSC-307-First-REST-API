@@ -1,3 +1,7 @@
+"""
+Used for testing the database.
+"""
+
 from model_mongodb import User
 
 users = {
