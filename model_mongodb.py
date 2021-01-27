@@ -40,7 +40,8 @@ class User(Model):
 
     @staticmethod
     def find_all(**query):
-        query['_id'] = ObjectId(query['_id'])
+        if '_id' in query:
+            query['_id'] = ObjectId(query['_id'])
         users = list(User.collection.find(query))
         for user in users:
             user["_id"] = str(user["_id"])
