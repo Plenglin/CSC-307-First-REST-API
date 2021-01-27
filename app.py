@@ -33,10 +33,9 @@ def get_users():
     if request.method == 'GET':
         return jsonify(list(User.find_all(**request.args)))
     elif request.method == 'POST':
-        userToAdd = {**request.get_json(), 'id': random_string()}
-        users['users_list'].append(userToAdd)
-        resp = jsonify(success=True)
-        return make_response(jsonify(userToAdd), 201)
+        user = User(request.get_json())
+        user.save()
+        return make_response(jsonify(user), 201)
     raise Exception("Unsupported method")
 
 

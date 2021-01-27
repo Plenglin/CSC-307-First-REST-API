@@ -61,7 +61,7 @@ def test_delete_user(client, populated_db, random_user):
 
 
 def test_create_user(client, populated_db):
-    resp = client.post(f'/users', {'name': "Test User", 'job': "Benchwarming"})
+    resp = client.post(f'/users', json={'name': "Test User", 'job': "Benchwarming"})
 
     uid = decode_resp(resp)['_id']
     data = decode_resp(client.get(f'/users/{uid}'))
