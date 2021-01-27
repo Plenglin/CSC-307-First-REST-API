@@ -16,18 +16,16 @@ CORS(app)
 
 @app.route('/users/<user_id>', methods=['GET', 'DELETE'])
 def get_user(user_id):
-    if request.method == 'GET':
-        for user in User.find_all(_id=user_id):
-            return user
+    users = User.find_all(_id=user_id)
+    if len(users) == 0:
         return jsonify(success=False, status=404)
-    elif request.method == 'DELETE':
-        to_delete = None
-        for i, user in enumerate(users['users_list']):
-            if user_id == user['id']:
-                del users['users_list'][i]
-                return jsonify(success=True)
+    [user] = users
 
-        return make_response(jsonify(success=False), 404)
+    if request.method == 'GET':
+        return user
+    elif request.method == 'DELETE':
+        user.remove()
+        return user
 
 
 @app.route('/users', methods=['GET', 'POST'])

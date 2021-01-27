@@ -29,7 +29,7 @@ class Model(dict):
 
     def remove(self):
         if self._id:
-            resp = self.collection.remove({"_id": ObjectId(self._id)})
+            resp = self.collection.delete_one({"_id": ObjectId(self._id)})
             self.clear()
             return resp
 
@@ -45,4 +45,8 @@ class User(Model):
         users = list(User.collection.find(query))
         for user in users:
             user["_id"] = str(user["_id"])
-        return users
+        return [User(u) for u in users]
+
+    @staticmethod
+    def flush():
+        User.collection.delete_many({})
